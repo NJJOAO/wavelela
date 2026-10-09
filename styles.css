@@ -21,3 +21,24 @@ html{scroll-padding-top:90px}body{font-size:16px;line-height:1.62;background:#ff
 
 /* Action alignment — final visual QA */
 .card-actions{display:flex;align-items:center;justify-content:space-between;gap:15px;flex-wrap:wrap;margin-top:7px}.card-actions .text-link{white-space:nowrap;margin:0}.card-actions .service-quote{white-space:nowrap;margin:0;display:inline-flex;gap:5px;align-items:center;color:#866529;border:1px solid #d5c8a5;border-radius:4px;padding:8px 11px;font-size:.75rem;line-height:1.15;transition:background .2s,color .2s}.card-actions .service-quote:hover{background:#f8f0dc;color:#332d1f}.card-actions a:active{transform:translateY(1px)}@media(max-width:550px){.card-actions{justify-content:flex-start;gap:12px}.card-actions .service-quote{padding:8px 12px}.service-content p{margin-bottom:17px}}
+
+/* WAVELELA v3 — commercial quote request, original visual system retained */
+[hidden]{display:none!important}
+.form-kicker{display:block;font-size:.69rem;font-weight:800;letter-spacing:.13em;color:#9b7935;margin-bottom:9px}
+.requester-choice{margin:22px 0 20px;padding:0;border:0;display:flex;flex-wrap:wrap;gap:11px}
+.requester-choice legend{font-size:.86rem;font-weight:750;color:#1a3142;float:none;display:block;width:100%;padding:0 0 9px}
+.requester-option{display:inline-flex;align-items:center;gap:9px;border:1px solid #d5d9d9;border-radius:5px;background:#fff;cursor:pointer;padding:11px 15px;font-size:.82rem;font-weight:700;color:#203a4b;transition:border-color .18s ease,background .18s ease}
+.requester-option:has(input:checked){background:#fbf7eb;border-color:#b69a61;box-shadow:inset 0 0 0 1px #cdb474}
+.requester-option input{accent-color:#977437;width:17px;height:17px;margin:0}
+.requester-option:focus-within{outline:3px solid #d1b78073;outline-offset:2px}
+.quote-form .form-grid label{font-size:.8rem;line-height:1.45;font-weight:700}
+.quote-form .form-grid label input,.quote-form .form-grid label select,.quote-form .form-grid label textarea{font-size:.89rem;font-weight:500}
+.quote-form .form-grid label:has(input:required:not([type=checkbox])):not(.hp-field),.quote-form .form-grid label:has(select:required),.quote-form .form-grid label:has(textarea:required){color:#172f41}
+.form-note{color:#586c79;line-height:1.55!important;font-size:.76rem!important;margin-top:15px!important}
+.form-note strong{color:#1a3c50;font-weight:700;overflow-wrap:anywhere}
+#form-status:not(:empty){padding:12px 13px;border-radius:5px;border-left:3px solid #b69a61;line-height:1.5;overflow-wrap:anywhere}
+#form-status.status-ok{background:#eff8f1;color:#15572c;border-left-color:#2c8148}
+#form-status.status-warning{background:#fff7eb;color:#77500e;border-left-color:#b47c1b}
+#form-status.status-progress{background:#f0f5f8;color:#244e68;border-left-color:#476d86}
+.quote-form [aria-busy=true]{cursor:progress}
+@media(max-width:550px){.requester-choice{gap:8px}.requester-option{padding:11px 12px;flex:1;justify-content:center;min-width:0;text-align:center}.quote-form .form-grid label{font-size:.82rem}.form-actions .btn{min-height:56px}}

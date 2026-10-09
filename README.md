@@ -1,48 +1,82 @@
-# WAVELELA — Website Corporativo V2.0
+# WAVELELA — Website Corporativo V3.0
 
-Redesign multi-page em português e inglês para Ship Chandling, Crew Change e Suporte Logístico. Usa HTML, CSS e JavaScript sem dependências externas, com um servidor Node.js opcional para envio seguro de e-mails.
+Esta versão mantém o design, as imagens e os conteúdos da V2.0, acrescentando um **pedido de cotação integrado** com backend de envio Resend, destinatário corporativo fixo `comercial@wavelela.ao` e protecções contra abuso/duplicações.
 
-## Instalação e pré-visualização
+## 1. Executar e testar
 
-- Pré-visualização estática: executar `python -m http.server 8080` nesta pasta e visitar `http://localhost:8080`.
-- Ambiente completo com API: requer **Node.js 20+**. Executar `npm start`, depois visitar `http://localhost:3000`.
-- Testes: `npm test` e `npm run check`.
+Requer **Node.js 20 ou superior**. Sem necessidade de instalar dependências externas.
 
-## Formulário / funcionamento real
+```bash
+npm start
+```
 
-O formulário valida dados no navegador e no servidor. A entrega automática depende de configurar `RESEND_API_KEY`, `MAIL_FROM` (remetente num domínio verificado) e `MAIL_TO` no ambiente do processo Node. Exemplo em `.env.example`; **Node não lê o ficheiro .env automaticamente**, pelo que é preciso exportar as variáveis através da plataforma de alojamento ou `node --env-file=.env server.js` em Node compatível. Nunca colocar credenciais em JavaScript público ou no GitHub.
+Abra `http://localhost:3000` e aceda a «Solicitar cotação». Para verificar a aplicação:
 
-Em alojamento estático como GitHub Pages, **o endpoint `/api/contact` não existe**: o formulário mostra uma ligação para criar um e-mail na aplicação do visitante. Essa alternativa não confirma a recepção pelo destinatário. Para entrega real, usar o servidor Node com HTTPS, ou migrar a API para uma função serverless equivalente. O servidor impõe validação, campo anti-spam, limite de corpo e limite de 8 pedidos/IP/hora em memória; num contexto de produção com múltiplas instâncias, usar limitação de tráfego partilhada e protecção anti-bot adicional.
+```bash
+npm run check
+npm test
+```
 
-## Publicação
+O formulário **não envia e-mails reais sem a configuração segura abaixo**. Em ambiente de pré-visualização não configurado, devolve mensagem de erro, sem limpar os dados. O backend é uma parte obrigatória para o envio; alojamento estático por si só não é suficiente.
 
-**Servidor Node:** escolher um alojamento de Node.js com HTTPS, definir o comando `npm start`, configurar domínio e DNS e adicionar as variáveis de ambiente. Confirmar envio e recepção de um pedido de teste antes de publicar o formulário.
+## 2. Activar o envio real — instruções exactas
 
-**GitHub Pages:** colocar todos os ficheiros do projecto na raiz de publicação. Se a publicação ocorrer em subdirectório, os links relativos são compatíveis. Recomenda-se associar domínio próprio e rever o caminho de `/api/contact` caso utilize serviço externo.
+1. Confirmar que a equipa comercial recebe correio no endereço **comercial@wavelela.ao** (configurado externamente ao website).
+2. Criar conta num serviço de e-mail transaccional compatível com a API da **Resend**: https://resend.com. Adicionar um domínio ou subdomínio de envio da empresa, validar DNS (SPF/DKIM segundo as instruções do fornecedor) e aguardar estado **verificado**. A caixa de recepção e o endereço de envio são coisas diferentes.
+3. Criar uma chave de API apenas para envio de e-mails, com as permissões mínimas aplicáveis. Guardá-la no ambiente secreto do alojamento, nunca em `app.js`, `config.js`, GitHub, páginas públicas ou no ZIP partilhado.
+4. Escolher alojamento com execução de **Node.js e HTTPS** (ou adaptar `server.js` a uma função serverless). Configurar estas variáveis **privadas** no painel do alojamento:
 
-## Conteúdos e activos
+   ```ini
+   RESEND_API_KEY=re_CHAVE_REAL_PRIVADA
+   MAIL_FROM="WAVELELA Comercial <cotacoes@wavelela.ao>"
+   NODE_ENV=production
+   PORT=3000
+   ```
 
-O símbolo dourado da WAVELELA (`wavelela-mark.png`) foi extraído do ficheiro do logotipo disponibilizado pelo utilizador e usado nas áreas institucionais. Para produção recomenda-se o ficheiro vectorial de marca, se existir. As fotografias de porto e serviços foram **geradas de novo em alta resolução** como material ilustrativo, e não são fotografias verificadas da operação da WAVELELA. Substituir por fotografias autorizadas e reais antes do lançamento. Dados de contacto foram transcritos do website original (confirmar que permanecem correctos).
+   O domínio de `MAIL_FROM` tem de estar verificado no serviço; o endereço acima é ilustrativo e só será utilizável após a verificação. O destinatário de todas as cotações está fixado no servidor: **comercial@wavelela.ao** (não pode ser substituído pelo browser).
+5. Executar `npm start` no servidor. Garantir que o URL público utiliza HTTPS e que `/api/contact` chega ao processo Node.
+6. Se o website continuar alojado no **GitHub Pages**, publicar o backend num domínio HTTPS separado e editar apenas a propriedade `quoteApiUrl` no ficheiro público `config.js`, por exemplo:
 
-A política de privacidade incluída é texto introdutório e requer revisão jurídica, incluindo base de tratamento, retenção, destinatários e exercício de direitos. Não existem projectos, clientes ou certificações inventados.
+   ```js
+   window.WAVELELA_CONFIG = { quoteApiUrl: 'https://api.seu-dominio-verificado.ao/api/contact' };
+   ```
 
-## Critérios antes de produção
+   Configurar também, **apenas no servidor**, `QUOTE_ALLOWED_ORIGINS` com as origens públicas autorizadas, separadas por vírgula (origem é esquema+domínio+porta, sem caminho), por exemplo `https://hugocoldbullet.github.io,https://www.wavelela.ao`. Sem isto o backend rejeitará o pedido feito a partir do domínio GitHub Pages; nunca usar `*`.
+7. Testar com uma submissão real aprovada pela empresa e verificar quatro pontos: resposta positiva do serviço Resend com ID; registo de entrega no painel do fornecedor (pode ser posterior à aceitação); recepção efectiva em `comercial@wavelela.ao`, incluindo Spam; e funcionamento do botão «Responder», destinado ao e-mail usado pelo solicitante.
 
-1. Rever identidade e logotipo definitivo; validar contactos e serviços com a empresa.
-2. Substituir imagens conceptuais por fotografias licenciadas/autorizadas.
-3. Configurar e testar serviço de e-mail de produção; confirmar domínio de envio.
-4. Rever texto e tratamento de dados pessoais, incluindo política de privacidade.
-5. Testar visualmente em Chrome, Firefox, Safari e dispositivos físicos; executar auditoria de acessibilidade WCAG 2.2 AA e Lighthouse.
-6. Instalar analytics apenas após definir objectivos e tratamento adequado de consentimento/cookies.
+**Importante:** `200 OK` do nosso endpoint significa que o fornecedor **aceitou** processar a mensagem; não prova recepção na caixa de entrada. Verifique a entrega, os registos e eventual necessidade de webhooks de estado antes de tratar a funcionalidade como plenamente operacional em produção.
 
-## Estrutura
+### Ficheiros `.env`
 
-`index.html`, `empresa.html`, `servicos.html`, três páginas por serviço, `contacto.html`, `privacidade.html`, `404.html`, `app.js`, `styles.css`, `assets/`, `server.js`, `tests/`.
+O ficheiro `.env.example` contém apenas marcadores sem segredo. Pode copiar para `.env` em desenvolvimento e lançar Node 20+ com `node --env-file=.env server.js`, mas **não partilhe esse ficheiro**. `npm start` não lê `.env` automaticamente. O `.gitignore` exclui `.env`.
 
-## Alterações da versão 2.0
+## 3. Regras do formulário
 
-- Novas imagens WebP independentes (hero 1672 × 941, serviços 1280 × 853 px) e imagem de destaque própria para telemóvel.
-- Marca dourada com transparência, nova composição do header e favicon.
-- Botões e links aprimorados, cartões com CTA específico por serviço, mapa esquemático responsivo e maior consistência visual.
-- Capturas completas de desktop, tablet e smartphone na pasta `previews/`.
-- Consultar `AUDITORIA_COMPARATIVA_V2.md` e `RELATORIO_TESTES.md`.
+**Empresas e entidades:** empresa, nome, e-mail, serviço/produto, descrição (10–3000 caracteres) e consentimento obrigatórios. **Particulares:** empresa deixa de ser exigida; os restantes campos continuam obrigatórios. Para «Outro serviço/produto», o nome do serviço é obrigatório. Telefone, local/porto, navio, ETA e prazo pretendido são opcionais.
+
+As ligações de cada serviço preservam a selecção através de `?servico=ship`, `?servico=crew`, `?servico=log`. A equipa recebe um e-mail de marca com assunto `Pedido de Cotação | Serviço | Empresa/Nome`, data e hora de Luanda, corpo HTML e texto, `Reply-To` do solicitante e referência única.
+
+Quando ocorre erro, os dados permanecem preenchidos. Não há recurso a `mailto:` para submeter um pedido.
+
+## 4. Antispam, segurança e duplicações
+
+- Validação de campos no navegador **e no servidor**; sanitação dos cabeçalhos, escaping HTML para o e-mail e limite de 16 KB por pedido.
+- Campo anti-bot oculto (honeypot), controlo da origem do pedido e limitação de **8 tentativas por hora por IP**, em memória.
+- Identificador UUID por pedido e `Idempotency-Key` enviado à Resend; repetições do mesmo pedido não duplicam o envio quando a plataforma o suporta (janela de 24 h). Respostas do servidor não expõem credenciais.
+- Nenhuma confirmação falsa de envio: mensagem de sucesso só após resposta positiva e ID da plataforma Resend.
+- Credenciais apenas no ambiente do servidor. Cabeçalhos seguros em ficheiros estáticos.
+
+**Para produção com várias instâncias:** substituir os contadores em memória por Redis ou serviço equivalente, adicionar Turnstile ou outro desafio antiautomação verificado no backend e configurar alertas/webhooks do fornecedor de e-mail. Os mecanismos actuais são uma primeira barreira, não uma solução definitiva contra tráfego automatizado distribuído.
+
+## 5. Conteúdos e limites
+
+- O logotipo dourado e as imagens marítimas da V2.0 foram preservados. As imagens marítimas são conceptuais, não fotografias documentais da empresa.
+- Dados institucionais e política de privacidade requerem validação final antes de publicação pública.
+- Não são fornecidas credenciais de e-mail nem acesso à caixa `comercial@wavelela.ao`; a recepção efectiva permanece **não testada**.
+- A navegação e a responsividade originais foram mantidas. Testes automatizados de API e código incluídos; foi possível validar o formulário num navegador com renderização isolada em três larguras, mas a navegação directa e a verificação visual do site completo foram bloqueadas pelas políticas do ambiente.
+
+Consulte `RELATORIO_COTACAO_V3.md`, `RELATORIO_TESTES.md` e `IMPLEMENTACAO.md`.
+
+## 6. Pré-visualizações
+
+A pasta `previews/` contém capturas V2 do website preservado e capturas **isoladas** do formulário V3 em três larguras (estas últimas são simulações do browser, não capturas de um site publicado).

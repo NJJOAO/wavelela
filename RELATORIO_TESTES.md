@@ -1,30 +1,22 @@
-# WAVELELA V2.0 — Relatório de verificação
+# Relatório de testes — WAVELELA V3.0
 
-**Data:** 08/10/2026
+Comandos reproduzíveis: `npm run check` e `npm test` (Node.js 20+). Não requerem credenciais nem enviam e-mails reais.
 
-## Resultados
+## Casos cobertos
 
-- Sintaxe `app.js` e `server.js`: PASSOU (`npm run check`).
-- Testes integrados `npm test`: PASSOU (consultar saída de execução).
-- Renderização isolada Chromium nas larguras **1440, 768, 390 e 320 px**: PASSOU, sem overflow horizontal.
-- Imagens locais: cinco elementos `<img>` da homepage descodificados (marca inicial/final e três serviços), além dos fundos fotográficos CSS; tamanhos e carregamento confirmados.
-- Navegação mobile: menu abre/fecha, tecla Escape fecha, `aria-expanded` acompanha o estado: PASSOU.
-- Alternância PT/EN: PASSOU no navegador isolado.
-- Perguntas frequentes: expansão com `<details>`: PASSOU.
-- Formulário: rejeição de campos vazios via validação nativa: PASSOU.
-- Renderização das 9 rotas, erro 404 e integridade dos links internos: PASSOU.
-- Erros JavaScript durante as verificações: nenhum registado.
+- Presença das nove páginas e carregamento dos scripts e activos originais.
+- Preservação de tipografia, CSS, responsividade e identidade visual anterior em ficheiros.
+- Presença de campos de cotação e regras condicionais no código.
+- Backend sem configuração: erro HTTP 503, sem falsa confirmação.
+- Validação de campos, honeypot, origem não autorizada e método HTTP indevido.
+- Envio aceite por fornecedor de e-mail **simulado**: validação de `to`, `reply_to`, HTML com caracteres escapados, texto, assunto e cabeçalho `Idempotency-Key`.
+- Pedido repetido com a mesma referência: não há segundo envio ao simulador; conteúdo alterado com a mesma referência gera erro 409.
+- Falha do fornecedor simulado: backend comunica HTTP 502 sem alegar sucesso.
+- Ficheiros privados de configuração não são expostos pelo servidor estático.
 
-## Teste HTTP local adicional
+## Limites da validação
 
-- `GET /index.html`: **200** — HTML entregue.
-- `GET /ship-chandling.html`: **200** — página de serviço entregue.
-- `GET /assets/service-supply.webp`: **200**, 234 282 bytes.
-- `POST /api/contact` com pedido inválido: **422**, com mensagem de validação.
-- `POST /api/contact` com dados válidos e sem credenciais: **503**, sem confirmação indevida de envio.
-
-## Limitações
-
-O Chromium usado para o ensaio bloqueia a navegação para URLs HTTP locais; para validação visual foi injectado o HTML/CSS/JS da aplicação num documento isolado com os activos locais embebidos, sem pedidos de rede. Isto verifica layout e interacções mas não substitui ensaio E2E da aplicação publicada num domínio real.
-
-**Envio de e-mails em produção não testado:** credenciais e domínio autorizado em falta. A presença de formulário/API não é comprovativo de entrega. Não foi executada auditoria WCAG 2.2 AA completa, Lighthouse real ou testes físicos de Safari/Firefox.
+- Os testes de interface foram complementados por renderização isolada em Chromium a **1440, 768 e 390 px** (sem carregar o website por HTTP). Foram verificados campos condicionais, ausência de transbordamento horizontal, persistência dos dados após resposta de erro simulada e limpeza apenas após sucesso simulado. A navegação directa pelo endereço local continuou bloqueada (`ERR_BLOCKED_BY_ADMINISTRATOR`), pelo que a inspeção visual integrada do website inteiro ficou pendente.
+- O envio foi simulado com API local de testes, **não com Resend real**.
+- Não existe prova de recepção em `comercial@wavelela.ao`, nem foram validados DNS do domínio ou entregabilidade.
+- Testar em alojamento HTTPS, Chrome/Firefox/Safari e dispositivos físicos antes da entrada em produção.

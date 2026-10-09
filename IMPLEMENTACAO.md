@@ -1,34 +1,28 @@
-# Matriz de rastreabilidade e estado da implementação
+# Matriz de implementação — WAVELELA V3.0
 
-| Recomendação | Solução | Critério de aceitação | Estado |
-|---|---|---|---|
-| Branding alinhado com o logotipo | Dourado/azul-marinho, marca raster fornecida | Marca presente em todas as páginas | Implementado; imagem vectorial definitiva pendente |
-| Melhor hierarquia | Hero, 3 serviços, credibilidade, processo, cobertura, FAQ, contacto | Secções visíveis e navegação | Implementado e validado em Chromium isolado; dispositivos físicos pendentes |
-| Páginas por serviço | 3 páginas específicas | URL individual e conteúdo relevante | Implementado e testado estruturalmente |
-| Navegação | 9 documentos HTML + navegação responsiva | Todos os links internos resolvem | Implementado; validação automatizada parcial |
-| Versão inglesa | Conteúdos principais PT/EN | Alternância de idioma persistente | Implementado; necessita revisão linguística nativa |
-| Formulário | Validação HTML + endpoint Node + fallback mailto | Entrega efectiva confirmada | Implementado, depende de credenciais e teste real de entrega |
-| Antispam | Honeypot, rate-limit simples, limites e origem | Pedidos inválidos rejeitados | Implementado; defesa adicional necessária em produção |
-| Contactos | Links e-mail/tel, contactos do site original | Dados iguais ao original | Implementado; validar com a empresa |
-| Acessibilidade | Foco visível, skip link, landmarks, labels, reduced motion | Auditoria WCAG 2.2 AA | Implementação parcial; auditoria manual pendente |
-| SEO | Titles, descriptions, robots | Indexação e structured data | Parcial: metadados genéricos; domínio/canonical/sitemap pendentes |
-| Fotografia corporativa | Novas imagens conceptuais independentes em alta resolução, WebP e recorte mobile | Fotografias oficiais da operação, autorizadas | Implementação conceptual testada — fotografia institucional real pendente |
-| Analytics | Sem recolha por defeito | Métricas e consentimento | Não implementado — aprovação pendente |
-| Política de privacidade | Página informativa inicial | Política jurídica validada | Parcial — validação jurídica pendente |
-| Publicação | Código e instruções para Node e static | Domínio e HTTPS operacional | Não implementado — depende de infraestrutura |
+| Requisito | Estado | Observação / prova |
+|---|---|---|
+| Preservar V2.0 e permitir recuperação | **Guardado** | `WAVELELA_BACKUP_V2_ANTES_COTACAO.zip`, entregue separadamente |
+| Manter identidade, serviços, navegação e imagens | **Implementado** | Reutilização dos ficheiros da V2.0, CSS novo apenas para formulário |
+| Empresa / particular com campos condicionais | **Implementado, testes de código** | Tipo de solicitante e campo empresa condicionado |
+| Nome, e-mail, telefone, serviço/produto, especificações, local, prazo | **Implementado, testes de código** | Obrigatórios sinalizados; opcionais definidos |
+| Pedido iniciado pelo serviço com selecção prévia | **Implementado, testes de código** | `?servico=ship|crew|log` e página de serviço |
+| E-mail corporativo formatado e assunto personalizado | **Implementado e testado com fornecedor simulado** | HTML+texto, referência, hora de Luanda e escaping HTML |
+| Entrega dirigida a comercial@wavelela.ao | **Implementado e testado com fornecedor simulado** | Destinatário fixo no backend, não controlado pelo browser |
+| Reply-To do solicitante | **Implementado e testado com fornecedor simulado** | Propriedade `reply_to` validada |
+| Sem mailto e sem falsas confirmações | **Implementado e testado localmente** | Sucesso só com resposta positiva e ID do fornecedor |
+| Preservar dados em caso de falha | **Implementado; teste de browser pendente** | O formulário é limpo só após sucesso confirmado |
+| Protecção anti-bot e duplicações | **Implementado com limitações** | Honeypot, rate limit em memória, UUID e idempotência Resend |
+| Envio real por fornecedor | **Implementado, dependente de credenciais e alojamento** | API Resend integrada; falta `RESEND_API_KEY` + `MAIL_FROM` verificado |
+| Confirmação de entrega na caixa | **Não testado** | Necessário envio real aprovado pela empresa e acesso à caixa/painel |
+| Testes visuais do formulário desktop/mobile/tablet | **Parcialmente testados** | Chromium isolado a 1440, 768 e 390 px, com simulação de falha e sucesso; navegação HTTP real bloqueada |
 
-## Inventário de recursos
+## Alterações relevantes
 
-- **Obrigatórios e gratuitos:** Node.js 20+, navegador, Git, editor de código; projecto sem dependências npm.
-- **Alojamento:** GitHub Pages gratuito para estático, mas sem API de envio; servidor Node, pago ou gratuito conforme fornecedor, para API.
-- **Envio de e-mail:** Resend ou serviço equivalente, pode ter planos gratuitos com limites; rever condições e preços actuais junto do fornecedor.
-- **Domínio personalizado:** recomendado; habitualmente com renovação paga.
-- **Fotografias:** preferir fotografia institucional própria; imagens de terceiros carecem de direitos e autorização.
+- `app.js`: UI de cotação, campos adaptativos, integração fetch, estados, restauro/preservação de campos.
+- `styles.css`: estilo do novo formulário, validação visual, áreas condicionais, legibilidade mobile.
+- `server.js`: API segura e envio Resend, origem permitida, limite de pedidos, deduplicação, formatação do e-mail.
+- `config.js`: endereço público e configurável do backend (sem segredos).
+- `.env.example`, `tests/`, `README.md`: configuração, testes e instruções.
 
-## Estado de validação
-
-Testes automatizados em `tests/site.test.js` verificam páginas, activos, estruturas, estilos responsivos e preparação de backend. **Não** são equivalentes a testes E2E em browsers nem provam envio de e-mails. Consultar `RELATORIO_TESTES.md`.
-
-## Actualização V2.0
-
-Consultar `AUDITORIA_COMPARATIVA_V2.md` para matriz antes/depois e `RELATORIO_TESTES.md` para resultados. A API externa de correio continua dependente de credenciais e não é dada como concluída.
+O resto do website permanece estruturalmente inalterado.
