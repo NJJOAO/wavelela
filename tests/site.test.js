@@ -7,3 +7,16 @@ test('all existing HTML pages remain available',async()=>{for(const name of ['in
 test('original visual assets and CSS preserved',async()=>{for(const f of ['wavelela-mark.png','wavelela-favicon.png','hero-port.webp','hero-mobile.webp','service-supply.webp','service-crew.webp','service-logistics.webp'])assert.ok((await stat(new URL(`../assets/${f}`,import.meta.url))).size>1000);const css=await readFile(new URL('../styles.css',import.meta.url),'utf8');for(const str of ['max-width:820px','max-width:550px','focus-visible','prefers-reduced-motion','.requester-choice','.form-note'])assert.ok(css.includes(str),str)});
 test('quote form supports people and organisations, conditional fields, service preselection and retries',()=>{for(const token of ['requesterType','individual','business','company','otherService','phone','deadline','port','eta','vessel','consent','details','reportValidity','requestId','submittedAt','syncConditional','newRequestId','?servico=${key}','comercial@wavelela.ao'])assert.ok(app.includes(token),token);assert.ok(app.includes('form.reset()'));assert.ok(app.includes('if(!res.ok||!body.ok||!body.providerAccepted)'));assert.ok(!app.includes('mailto:pedidos@wavelela.com'))});
 test('server uses fixed recipient, idempotency and secure-only private secret',async()=>{const server=await readFile(new URL('../server.js',import.meta.url),'utf8');assert.ok(server.includes("MAIL_TO='comercial@wavelela.ao'"));assert.ok(server.includes("'Idempotency-Key':d.requestId"));assert.ok(server.includes('process.env.RESEND_API_KEY'));assert.ok(server.includes('escapeHTML'));assert.ok(server.includes('reply_to:d.email'));assert.ok(server.includes('QUOTE_ALLOWED_ORIGINS'));assert.ok(!app.includes('RESEND_API_KEY'))});
+
+test('updated contact numbers are consistent across footer and contact panel',()=>{
+  for(const [shown,tel] of [
+    ['+244 931 631 327','tel:+244931631327'],
+    ['+244 931 631 429','tel:+244931631429']
+  ]){
+    assert.equal(app.split(shown).length-1,2,`visible contact ${shown} in footer and contact section`);
+    assert.equal(app.split(tel).length-1,2,`dial link ${tel} in footer and contact section`);
+  }
+  for(const old of ['+244 930 752 810','+244 939 370 841','tel:+244930752810','tel:+244939370841']){
+    assert.ok(!app.includes(old),`retired number ${old} must not appear in the website source`);
+  }
+});
